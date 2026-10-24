@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "usernames": {
+      ".read": "auth != null",
+      "$u": { ".write": "auth != null && !data.exists() && newData.val() === auth.uid" }
+    },
+    "users": {
+      ".read": "auth != null",
+      "$uid": { ".write": "auth != null && auth.uid === $uid" }
+    },
+    "chats": {
+      "$cid": {
+        ".read": "auth != null && data.child('members').child(auth.uid).exists()",
+        ".write": "auth != null && ((!data.exists() && newData.child('members').child(auth.uid).exists()) || data.child('members').child(auth.uid).exists())"
+      }
+    },
+    "calls": {
+      "$cid": {
+        ".read": "auth != null && root.child('chats').child($cid).child('members').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('chats').child($cid).child('members').child(auth.uid).exists()"
+      }
+    },
+    "userCalls": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$cid": {
+          ".write": "auth != null && (auth.uid === $uid || root.child('chats').child($cid).child('members').child(auth.uid).exists())"
+        }
+      }
+    },
+    "userChats": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$cid": {
+          ".write": "auth != null && (auth.uid === $uid || root.child('chats').child($cid).child('members').child(auth.uid).exists())"
+        }
+      }
+    }
+  }
+}
